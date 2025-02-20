@@ -15,5 +15,7 @@
 
 # include "./ft_printf/Libft/libft.h"
 # include "./ft_printf/ft_printf.h"
+# include <signal.h>
+# include <time.h>
 
 #endif
