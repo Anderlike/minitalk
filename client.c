@@ -14,32 +14,33 @@
 
 volatile sig_atomic_t ack_received = 0;
 
-void	ft_error(void)
+void    ft_error(void)
 {
-	ft_printf("Error\n");
-	exit(0);
+    ft_printf("Error\n");
+    exit(0);
 }
+
 
 void ack_handler(int signal)
 {
-	(void)signal;
-	ack_received = 1;
+    (void)signal;
+    ack_received = 1;
 }
 
-void	ft_send_bits(int pid, char i)
+void ft_send_bits(int pid, char i)
 {
-	int	bit;
+    int bit;
 
-	bit = 0;
-	while (bit < 8)
-	{
-		if ((i & (0x01 << bit)) != 0)
-			kill(pid, SIGUSR1);
-		else
-			kill(pid, SIGUSR2);
-		usleep(100);
-		bit++;
-	}
+    bit = 0;
+    while (bit < 8)
+    {
+        if ((i & (0x01 << bit)) != 0)
+            kill(pid, SIGUSR1);
+        else
+            kill(pid, SIGUSR2);
+        usleep(100);
+        bit++;
+    }
 }
 
 int main(int argc, char **argv)
