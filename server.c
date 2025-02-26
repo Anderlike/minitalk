@@ -19,6 +19,9 @@ void	ft_handler(int signal)
 
 	if (signal == SIGUSR1)
 		i |= (0x01 << bit);
+	else if(signal == SIGUSR2)
+		i &= ~(0x01 << bit);
+	
 	bit++;
 	if (bit == 8)
 	{
@@ -45,8 +48,14 @@ int	main(int argc, char **argv)
 	ft_printf("PID: %d\n", pid);
 	ft_printf("Waiting...\n");
 
-	signal(SIGUSR1, ft_handler);
-	signal(SIGUSR2, ft_handler);
+
+	struct sigaction sa;
+	sa.sa_handler = ft_handler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
+
+	sigaction(SIGUSR1, &sa, NULL);
+	sigaction(SIGUSR2, &sa, NULL);
 
 	while (1)
 	{
