@@ -11,7 +11,20 @@
 /* ************************************************************************** */
 
 #include "./lib/minitalk.h"
-#include <stdio.h>
+
+volatile sig_atomic_t ack_received = 0;
+
+void	ft_error(void)
+{
+	ft_printf("Error\n");
+	exit(0);
+}
+
+void ack_handler(int signal)
+{
+	(void)signal;
+	ack_received = 1;
+}
 
 void	ft_send_bits(int pid, char i)
 {
@@ -29,26 +42,30 @@ void	ft_send_bits(int pid, char i)
 	}
 }
 
-int	main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-	int	pid;
-	int	i;
+    int pid;
+    int i;
 
-	i = 0;
-	if (argc == 3)
-	{
-		pid = atoi(argv[1]);
-		while (argv[2][i] != '\0')
-		{
-			ft_send_bits(pid, argv[2][i]);
-			i++;
-		}
-		ft_send_bits(pid, '\n');
-	}
-	else
+    i = 0;
+    if (argc == 3)
     {
-        ft_printf("Error\n");
-        return (1);
+        pid = atoi(argv[1]);
+        signal(SIGUSR1, ack_handler);
+        while (argv[2][i] != '\0')
+        {
+            ack_received = 0;
+            ft_send_bits(pid, argv[2][i]);
+            while (!ack_received)
+                usleep(100);
+            i++;
+        }
+        ack_received = 0;
+        ft_send_bits(pid, '\n');
+        while (!ack_received)
+            usleep(100);
     }
-	return (0);
+    else
+        ft_error();
+    return (0);
 }

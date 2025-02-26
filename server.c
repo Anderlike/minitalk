@@ -12,54 +12,53 @@
 
 #include "./lib/minitalk.h"
 
-void	ft_handler(int signal)
+void ft_handler(int signal, siginfo_t *info, void *context)
 {
-	static int	bit = 0;
-	static int	i = 0;
+    static int bit = 0;
+    static int i = 0;
+    (void)context;
 
-	if (signal == SIGUSR1)
-		i |= (0x01 << bit);
-	else if(signal == SIGUSR2)
-		i &= ~(0x01 << bit);
-	
-	bit++;
-	if (bit == 8)
-	{
-		if (i == '\n')
-			write(1, "\n", 1);
-		else
-			write(1, &i, 1);
-		bit = 0;
-		i = 0;
-	}
+    if (signal == SIGUSR1)
+        i |= (0x01 << bit);
+    else if (signal == SIGUSR2)
+        i &= ~(0x01 << bit);
+
+    bit++;
+    if (bit == 8)
+    {
+        if (i == '\n')
+            write(1, "\n", 1);
+        else
+            write(1, &i, 1);
+        bit = 0;
+        i = 0;
+        kill(info->si_pid, SIGUSR1);
+    }
 }
 
-int	main(int argc, char **argv)
+int main(int argc, char **argv)
 {
-	int	pid;
+    int pid;
 
-	(void)argv;
-	if (argc != 1)
-	{
-		ft_printf("Error\n");
-		return (0);
-	}
-	pid = getpid();
-	ft_printf("PID: %d\n", pid);
-	ft_printf("Waiting...\n");
+    (void)argv;
+    if (argc != 1)
+    {
+        ft_printf("Error\n");
+        return (0);
+    }
+    pid = getpid();
+    ft_printf("PID: %d\n", pid);
+    ft_printf("Waiting...\n");
 
-
-	struct sigaction sa;
-	sa.sa_handler = ft_handler;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_RESTART;
-
-	sigaction(SIGUSR1, &sa, NULL);
-	sigaction(SIGUSR2, &sa, NULL);
-
-	while (1)
-	{
-		pause();
-	}
-	return (0);
+    struct sigaction sa;
+    sa.sa_sigaction = ft_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_SIGINFO | SA_RESTART;
+    sigaction(SIGUSR1, &sa, NULL);
+    sigaction(SIGUSR2, &sa, NULL);
+    while (1)
+    {
+        pause();
+    }
+    return (0);
 }
