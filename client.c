@@ -38,7 +38,7 @@ void ft_send_bits(int pid, char i)
             kill(pid, SIGUSR1);
         else
             kill(pid, SIGUSR2);
-        usleep(100);
+        usleep(750);
         bit++;
     }
 }
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
             ack_received = 0;
             ft_send_bits(pid, argv[2][i]);
             while (!ack_received)
-                usleep(100);
+                usleep(750);
             i++;
         }
         ack_received = 0;
