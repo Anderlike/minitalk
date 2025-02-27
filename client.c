@@ -12,7 +12,7 @@
 
 #include "./lib/minitalk.h"
 
-volatile sig_atomic_t ack_received = 0;
+volatile int g_received = 0;
 
 void    ft_error(void)
 {
@@ -21,13 +21,13 @@ void    ft_error(void)
 }
 
 
-void ack_handler(int signal)
+static void    g_handler(int signal)
 {
     (void)signal;
-    ack_received = 1;
+    g_received = 1;
 }
 
-void ft_send_bits(int pid, char i)
+static void    ft_send_bits(int pid, char i)
 {
     int bit;
 
@@ -52,18 +52,18 @@ int main(int argc, char **argv)
     if (argc == 3)
     {
         pid = atoi(argv[1]);
-        signal(SIGUSR1, ack_handler);
+        signal(SIGUSR1, g_handler);
         while (argv[2][i] != '\0')
         {
-            ack_received = 0;
+            g_received = 0;
             ft_send_bits(pid, argv[2][i]);
-            while (!ack_received)
+            while (!g_received)
                 usleep(750);
             i++;
         }
-        ack_received = 0;
+        g_received = 0;
         ft_send_bits(pid, '\n');
-        while (!ack_received)
+        while (!g_received)
             usleep(100);
     }
     else

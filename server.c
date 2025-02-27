@@ -12,7 +12,13 @@
 
 #include "./lib/minitalk.h"
 
-void ft_handler(int signal, siginfo_t *info, void *context)
+void    ft_error(void)
+{
+    ft_printf("Error\n");
+    exit(0);
+}
+
+static void ft_handler(int signal, siginfo_t *info, void *context)
 {
     static int bit = 0;
     static int i = 0;
@@ -37,18 +43,10 @@ void ft_handler(int signal, siginfo_t *info, void *context)
 
 int main(int argc, char **argv)
 {
-    int pid;
-
     (void)argv;
     if (argc != 1)
-    {
-        ft_printf("Error\n");
-        return (0);
-    }
-    pid = getpid();
-    ft_printf("PID: %d\n", pid);
-    ft_printf("Waiting...\n");
-
+        ft_error();
+    ft_printf("PID: %d\n", getpid());
     struct sigaction sa;
     sa.sa_sigaction = ft_handler;
     sigemptyset(&sa.sa_mask);
@@ -56,8 +54,6 @@ int main(int argc, char **argv)
     sigaction(SIGUSR1, &sa, NULL);
     sigaction(SIGUSR2, &sa, NULL);
     while (1)
-    {
         pause();
-    }
     return (0);
 }

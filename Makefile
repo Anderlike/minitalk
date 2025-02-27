@@ -24,7 +24,7 @@ CFLAGS = -Wall -Wextra -Werror
 
 LIBFTPRINTF = ./lib/ft_printf/libftprintf.a
 
-all: $(CLIENT) $(SERVER)
+all: $(SERVER) $(CLIENT)
 
 $(CLIENT): $(C_OBJECTS) $(LIBFTPRINTF)
 	$(CC) $(CFLAGS) -o $(CLIENT) $(C_OBJECTS) -L./lib/ft_printf -lftprintf
